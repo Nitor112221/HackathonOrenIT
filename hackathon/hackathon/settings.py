@@ -9,17 +9,28 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import os
 from pathlib import Path
+
+import dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure--3js-jhbhnc&!!3f#g67kkkm173#6vi56#-ey-of!)^lzol%3e'
+dotenv.load_dotenv()
 
-DEBUG = True
 
-ALLOWED_HOSTS = []
+def get_env_bool(key: str, default: str = 'true') -> bool:
+    return os.getenv(key, default).lower() in (
+        'true',
+        'yes',
+        '1',
+        'y',
+    )
 
+
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'YOUR_KEY')
+DEBUG = get_env_bool('DJANGO_DEBUG')
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '*').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -28,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Installed applications
+    # Project applications
 ]
 
 MIDDLEWARE = [
@@ -38,6 +51,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Installed middleware
+    # Project middleware
 ]
 
 ROOT_URLCONF = 'hackathon.urls'
@@ -59,32 +74,33 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'hackathon.wsgi.application'
 
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    },
 }
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': ('django.contrib.auth'
+                 '.password_validation.UserAttributeSimilarityValidator'),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': ('django.contrib.auth'
+                 '.password_validation.MinimumLengthValidator'),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': ('django.contrib.auth.'
+                 'password_validation.CommonPasswordValidator'),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': ('django.contrib.auth'
+                 '.password_validation.NumericPasswordValidator'),
     },
 ]
 
-
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
 
@@ -92,6 +108,17 @@ USE_I18N = True
 
 USE_TZ = True
 
+
 STATIC_URL = 'static/'
+STATIC_DIR = BASE_DIR / 'static'
+STATICFILES_DIRS = []
+if STATIC_DIR.exists():
+    STATICFILES_DIRS += [BASE_DIR / 'static']
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

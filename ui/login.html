@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Вход {% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="logo"></div>
+            <h1>Вход в аккаунт</h1>
+            <p>Добро пожаловать! Войди, чтобы продолжить обучение</p>
+        </div>
+
+        <form action="/api/auth/login" method="POST" class="auth-form">
+            <div class="form-group">
+                <label for="username">Имя пользователя или Email</label>
+                <input type="text"
+                       id="username"
+                       name="username"
+                       required
+                       placeholder="Введи логин или email"
+                       value="{{ username }}">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <input type="password"
+                       id="password"
+                       name="password"
+                       required
+                       placeholder="Введите пароль">
+            </div>
+
+            <div class="form-options">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="remember_me" value="true">
+                    <span>Запомнить меня</span>
+                </label>
+            </div>
+
+            <button type="submit" class="btn-primary btn-login">Войти</button>
+
+            {% if error %}
+            <div class="error-message">
+                {{ error }}
+            </div>
+            {% endif %}
+        </form>
+
+        <div class="auth-footer">
+            <p>Нет аккаунта? <a href="/register">Зарегистрироваться</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

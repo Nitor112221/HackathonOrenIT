@@ -13,6 +13,9 @@ class UserProfileInline(admin.TabularInline):
 class UserProfileAdmin(UserAdmin):
     inlines = (UserProfileInline,)
 
+class ProfileAdmin(admin.ModelAdmin):
+    pass
 
 admin.site.unregister(User)
 admin.site.register(User, UserProfileAdmin)
+admin.site.register(users.models.Profile, ProfileAdmin)

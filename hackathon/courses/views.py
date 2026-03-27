@@ -90,13 +90,13 @@ def complete_fragment(request, fragment_id):
         progress.completed = True
         progress.completed_at = timezone.now()
         progress.save()
-        request.user.total_xp += fragment.xp_reward
-        request.user.save()
+        request.user.profile.total_xp += fragment.xp_reward
+        request.user.profile.save()
 
     return render(
         request,
         'courses/fragments/fragment_base.html',
-        {'fragment': fragment},
+        {'fragment': fragment },
     )
 
 
@@ -142,13 +142,16 @@ def submit_task(request, fragment_id):
             progress.completed = True
             progress.completed_at = timezone.now()
             progress.save()
-            user.total_xp += fragment.xp_reward
-            user.save()
+            user.profile.total_xp += fragment.xp_reward
+            user.profile.save()
 
         return render(
             request,
             'courses/fragments/fragment_base.html',
-            {'fragment': fragment},
+            {
+                'fragment': fragment,
+                'completed': True,
+             },
         )
     else:
         context = {

@@ -25,6 +25,7 @@ import hackathon.views
 urlpatterns = [
     django.urls.path('admin/', django.contrib.admin.site.urls),
     django.urls.path('users/', django.urls.include('users.urls')),
+    django.urls.path('', django.urls.include('courses.urls')),
     django.urls.path('', hackathon.views.HomeTemplate.as_view(), name='home'),
 ]
 

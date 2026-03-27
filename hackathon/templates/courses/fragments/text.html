@@ -1,0 +1,14 @@
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Текстовая лекция</h5>
+        <div class="card-text">
+            {{ fragment.data.content|safe }}
+        </div>
+        <button class="btn btn-success mt-3"
+                hx-post="{% url 'complete_fragment' fragment.id %}"
+                hx-target="#fragment-container"
+                hx-swap="innerHTML">
+            Отметить как пройденное
+        </button>
+    </div>
+</div>

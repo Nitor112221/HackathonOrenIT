@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ lesson.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ lesson.title }}</h1>
+    <p>{{ lesson.description }}</p>
+
+    <div class="fragment-circles d-flex justify-content-center gap-2 my-4">
+        {% for frag in fragments %}
+            <button class="fragment-circle btn rounded-circle 
+                {% if frag.id == current_fragment.id %}active{% endif %}
+                {% if frag.id in completed_ids %}completed{% endif %}"
+                data-fragment-id="{{ frag.id }}"
+                hx-get="{% url 'fragment_detail' frag.id %}"
+                hx-target="#fragment-container"
+                hx-swap="innerHTML"
+                hx-push-url="false">
+                {{ forloop.counter }}
+            </button>
+        {% endfor %}
+    </div>
+    <div id="fragment-container">
+        {% include 'courses/fragments/fragment_base.html' with fragment=current_fragment %}
+    </div>
+</div>
+
+<style>
+.fragment-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #ccc;
+    color: white;
+    border: none;
+    transition: all 0.2s;
+}
+.fragment-circle.completed {
+    background-color: #28a745;
+}
+.fragment-circle.active {
+    background-color: #007bff;
+    box-shadow: 0 0 0 2px white, 0 0 0 4px #007bff;
+}
+.fragment-circle:hover {
+    transform: scale(1.1);
+}
+</style>
+{% endblock %}

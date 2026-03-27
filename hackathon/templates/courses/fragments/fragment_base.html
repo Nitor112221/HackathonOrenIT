@@ -1,0 +1,15 @@
+{% load static %}
+
+<div class="fragment-content">
+    {% if fragment.type == 'video' %}
+        {% include 'courses/fragments/video.html' %}
+    {% elif fragment.type == 'text' %}
+        {% include 'courses/fragments/text.html' %}
+    {% elif fragment.type == 'code' %}
+        {% include 'courses/fragments/code.html' %}
+    {% elif fragment.type == 'quiz' %}
+        {% include 'courses/fragments/quiz.html' %}
+    {% elif fragment.type == 'short_answer' %}
+        {% include 'courses/fragments/short_answer.html' %}
+    {% endif %}
+</div>

@@ -59,3 +59,23 @@ class UserFragmentProgress(models.Model):
 
     class Meta:
         unique_together = ['user', 'fragment']
+
+
+class TaskAttempt(models.Model):
+    STATUS_CHOICES = (
+        ('pending', 'Ожидает'),
+        ('running', 'Выполняется'),
+        ('success', 'Успешно'),
+        ('failure', 'Ошибка'),
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='task_attempts')
+    fragment = models.ForeignKey(Fragment, on_delete=models.CASCADE, related_name='attempts')
+    answer = models.JSONField(default=dict)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    output = models.TextField(blank=True)
+    is_correct = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.fragment} - {self.status}"

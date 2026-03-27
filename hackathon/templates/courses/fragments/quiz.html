@@ -1,0 +1,25 @@
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Викторина</h5>
+        <form hx-post="{% url 'submit_task' fragment.id %}" hx-target="#fragment-container" hx-swap="innerHTML">
+            {% csrf_token %}
+            {% for question in fragment.data.questions %}
+                <div class="mb-3">
+                    <p><strong>{{ question.text }}</strong></p>
+                    {% for option in question.options %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="options" value="{{ forloop.counter0 }}" id="opt{{ forloop.parentloop.counter }}_{{ forloop.counter }}">
+                            <label class="form-check-label" for="opt{{ forloop.parentloop.counter }}_{{ forloop.counter }}">
+                                {{ option }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Ответить</button>
+        </form>
+        {% if error %}
+            <div class="alert alert-danger mt-3">{{ error }}</div>
+        {% endif %}
+    </div>
+</div>

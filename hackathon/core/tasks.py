@@ -2,11 +2,16 @@ import json
 import tempfile
 import subprocess
 import shutil
+import traceback
 
-from hackathon.celery import app
+from django.contrib.auth import get_user_model
+from django.utils import timezone
+
+import courses.models
+from hackathon.celery_config import app
 
 @app.task
-def run_user_code_in_docker(user_code, author_code, checker, tests, time_limit, memory_limit, pk):
+def run_user_code_in_docker(user_code, author_code, checker, tests, time_limit, memory_limit, pk, user_id, fragment_id):
     """
     Запускает пользовательский код в Docker-контейнере.
 
@@ -23,9 +28,16 @@ def run_user_code_in_docker(user_code, author_code, checker, tests, time_limit, 
         dict: {'status': 'AC', 'test_error': None, 'message': None} или
               {'status': 'WA'/'TL'/'RE'/'Fail', 'test_error': int, 'message': str}
     """
+    User = get_user_model()
+    user = User.objects.get(id=user_id)
+    fragment = courses.models.Fragment.objects.get(id=fragment_id)
+
+    attempt: courses.models.TaskAttempt = courses.models.TaskAttempt.objects.get(id=pk)
+    attempt.status = 'running'
+    attempt.save()
     temp_dir = tempfile.mkdtemp()
     try:
-        shutil.copy("hackathon/core/code_runner.py", temp_dir)
+        shutil.copy('core/code_runner.py', temp_dir)
 
         # Подготавливаем тесты для передачи через окружение
         tests_json = json.dumps(tests)
@@ -34,15 +46,13 @@ def run_user_code_in_docker(user_code, author_code, checker, tests, time_limit, 
             'docker', 'run', '--rm',
             '-v', f'{temp_dir}:/mnt',
             '--memory', f'{memory_limit}m',                     # ограничение памяти
-            '--ulimit', f'cpu={time_limit * 3 * len(tests)}',   # ограничение CPU
-            '--cap-add=SYS_RESOURCE',                           # для resource.setrlimit
             '-e', f'TESTS={tests_json}',
             '-e', f'TIME_LIMIT={time_limit}',
             '-e', f'MEMORY_LIMIT={memory_limit}',
             '-e', f'USER_CODE={user_code}',
             '-e', f'AUTHOR_CODE={author_code}',
             '-e', f'CHECKER={checker}',
-            'python:3', 'python', '/mnt/runner.py'
+            'python:3', 'python', '/mnt/code_runner.py'
         ]
         proc = subprocess.run(
             cmd,
@@ -60,8 +70,41 @@ def run_user_code_in_docker(user_code, author_code, checker, tests, time_limit, 
                 'test_error': None,
                 'message': f'Invalid output from runner: {output}'
             }
+        if result['status'] == 'AC':
+            attempt.status = 'success'
+            attempt.is_correct = True
+        else:
+            attempt.status = 'failure'
+            attempt.is_correct = False
+            attempt.output = f'Ошибка на тесте{result["test_error"]}.\nСообщение: {result["message"]}'
 
-        # TODO: добавить в базу данные
+        attempt.completed_at = timezone.now()
+        attempt.save()
 
+        if attempt.is_correct:
+            progress, created = courses.models.UserFragmentProgress.objects.get_or_create(
+                user=user,
+                fragment=fragment
+            )
+            if not progress.completed:
+                progress.completed = True
+                progress.completed_at = timezone.now()
+                progress.save()
+                user.profile.total_xp += fragment.xp_reward
+                user.profile.save()
+    except subprocess.TimeoutExpired as e:
+        # Общий таймаут выполнения всех тестов
+        attempt.status = 'failure'
+        attempt.is_correct = False
+        attempt.output = f'Превышено общее время выполнения (таймаут {e.timeout} сек).'
+        attempt.completed_at = timezone.now()
+        attempt.save()
+    except Exception as e:
+        # Любая другая ошибка (docker не установлен, ошибка копирования, и т.п.)
+        attempt.status = 'failure'
+        attempt.is_correct = False
+        attempt.output = f'Внутренняя ошибка при проверке: {str(e)}\n{traceback.format_exc()}'
+        attempt.completed_at = timezone.now()
+        attempt.save()
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)

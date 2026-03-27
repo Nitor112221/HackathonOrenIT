@@ -29,4 +29,9 @@ urlpatterns = [
         courses.views.submit_task,
         name='submit_task',
     ),
+    path(
+        'fragment/<int:fragment_id>/status/',
+        courses.views.fragment_status,
+        name='fragment_status',
+    ),
 ]

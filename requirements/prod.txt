@@ -1,3 +1,5 @@
 celery==5.6.3
 Django==5.2.12
+gevent==24.11.1 # for celery on windows
 python-dotenv~=1.0.1
+redis==7.4.0

@@ -6,7 +6,7 @@
     {% elif fragment.type == 'text' %}
         {% include 'courses/fragments/text.html' %}
     {% elif fragment.type == 'code' %}
-        {% include 'courses/fragments/code.html' %}
+        {% include 'courses/fragments/code.html' with fragment=fragment last_attempt=last_attempt pending=pending user_code=user_code %}
     {% elif fragment.type == 'quiz' %}
         {% include 'courses/fragments/quiz.html' %}
     {% elif fragment.type == 'short_answer' %}

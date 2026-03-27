@@ -30,17 +30,10 @@ class VideoDTO:
 
 
 @dataclass
-class TestDTO:
-    input: str
-
-
-@dataclass
 class CodeDTO:
     description: str
-    test_cases: List[TestDTO]
+    test_cases: List[str]
     checker_code: str
     author_solve: str
-    author_language: str
-    test_examples_count: int
     time_limit: int = 2
     memory_limit: int = 128

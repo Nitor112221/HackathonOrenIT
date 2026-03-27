@@ -1,0 +1,76 @@
+{% load static %}
+
+<div id="code-fragment">
+    <div class="card-text">
+        <p><strong>{{ fragment.data.description }}</strong></p>
+    </div>
+
+    <form hx-post="{% url 'submit_task' fragment.id %}"
+          hx-target="#fragment-container"
+          hx-swap="innerHTML"
+          id="code-form">
+        {% csrf_token %}
+        <textarea name="answer" rows="12" cols="80" placeholder="Введите ваш код на Python">{{ user_code|default:'' }}</textarea>
+        <br>
+        <button type="submit" {% if pending %}disabled{% endif %}>Отправить на проверку</button>
+    </form>
+
+    <div id="status-area">
+        {% if pending %}
+            <div class="alert alert-info">Решение проверяется, подождите...</div>
+        {% elif last_attempt %}
+            {% if last_attempt.is_correct %}
+                <div class="alert alert-success">
+                    ✅ Решение верное! Получено {{ fragment.xp_reward }} XP.
+                </div>
+            {% else %}
+                <div class="alert alert-danger">
+                    ❌ Ошибка: {{ last_attempt.message|default:"Решение не прошло проверку." }}
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Функция опроса статуса
+    function checkStatus() {
+        fetch("{% url 'fragment_status' fragment.id %}")
+            .then(response => response.json())
+            .then(data => {
+                const statusArea = document.getElementById('status-area');
+                const submitBtn = document.querySelector('#code-form button');
+
+                if (data.status === 'pending' || data.status === 'running') {
+                    // Продолжаем опрос
+                    setTimeout(checkStatus, 2000);
+                } else {
+                    // Проверка завершена
+                    submitBtn.disabled = false;
+                    if (data.status === 'success' && data.is_correct) {
+                        statusArea.innerHTML = `
+                            <div class="alert alert-success">
+                                ✅ Решение верное! Получено {{ fragment.xp_reward }} XP.
+                            </div>
+                        `;
+                    } else {
+                        let errorMsg = data.message || 'Неизвестная ошибка при проверке.';
+                        statusArea.innerHTML = `
+                            <div class="alert alert-danger">
+                                ❌ Ошибка: ${errorMsg}
+                            </div>
+                        `;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка при опросе статуса:', error);
+                setTimeout(checkStatus, 3000); // повтор при ошибке сети
+            });
+    }
+
+    // Если при загрузке фрагмента статус pending – начинаем опрос
+    {% if pending %}
+        checkStatus();
+    {% endif %}
+</script>

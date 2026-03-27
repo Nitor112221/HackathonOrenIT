@@ -2,8 +2,8 @@ import os
 
 from celery import Celery
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'clash_of_code.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'hackathon.settings')
 
-app = Celery('clash_of_code')
+app = Celery('hackathon')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()

@@ -19,7 +19,12 @@ class UserFragmentProgressAdmin(admin.ModelAdmin):
     pass
 
 
+class TaskAttemptAdmin(admin.ModelAdmin):
+    pass
+
+
 admin.site.register(courses.models.Module, ModuleAdmin)
 admin.site.register(courses.models.Lesson, LessonAdmin)
 admin.site.register(courses.models.Fragment, FragmentAdmin)
 admin.site.register(courses.models.UserFragmentProgress, UserFragmentProgressAdmin)
+admin.site.register(courses.models.TaskAttempt, TaskAttemptAdmin)

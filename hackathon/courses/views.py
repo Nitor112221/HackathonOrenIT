@@ -1,10 +1,12 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, render, redirect
 from django.utils import timezone
 from django.views.generic import DetailView, ListView
 
+import core.dto
+from core.tasks import run_user_code_in_docker
 from courses.models import Fragment, Lesson, Module, TaskAttempt, UserFragmentProgress
 
 
@@ -68,13 +70,14 @@ class LessonDetailView(LoginRequiredMixin, DetailView):
 @login_required
 def fragment_detail(request, fragment_id):
     fragment = get_object_or_404(Fragment, id=fragment_id)
+    user = request.user
+    last_attempt = TaskAttempt.objects.filter(user=user, fragment=fragment).order_by('-created_at').first()
+    pending = last_attempt and last_attempt.status == 'pending'
     context = {
         'fragment': fragment,
-        'completed': UserFragmentProgress.objects.filter(
-            user=request.user,
-            fragment=fragment,
-            completed=True,
-        ).exists(),
+        'last_attempt': last_attempt,
+        'pending': pending,
+        'user_code': last_attempt.answer if last_attempt and not pending else '',
     }
     return render(request, 'courses/fragments/fragment_base.html', context)
 
@@ -108,12 +111,40 @@ def submit_task(request, fragment_id):
 
     is_correct = False
     if fragment.type == 'code':
-        # TODO добавить обработку посылок
         # Отправляем задачу в Celery
-        # Здесь нужно отправить задачу в Celery, а пока вернём сообщение
-        return HttpResponse(
-            '<div class="alert alert-info">Код отправлен на проверку. '
-            'Результат появится позже.</div>',
+        attempt = TaskAttempt.objects.create(
+            user=user,
+            fragment=fragment,
+            answer=answer,
+            status='pending',
+            is_correct=False,
+            completed_at=timezone.now(),
+        )
+        dto = core.dto.CodeDTO(**fragment.data)
+        run_user_code_in_docker.delay(
+            answer,
+            dto.author_solve,
+            dto.checker_code,
+            dto.test_cases,
+            dto.time_limit,
+            dto.memory_limit,
+            attempt.pk,
+            user.pk,
+            fragment.pk,
+        )
+
+        last_attempt = TaskAttempt.objects.filter(user=user, fragment=fragment).order_by('-created_at').first()
+        pending = last_attempt and last_attempt.status == 'pending'
+        context = {
+            'fragment': fragment,
+            'last_attempt': last_attempt,
+            'pending': pending,
+            'user_code': last_attempt.answer if last_attempt and not pending else '',
+        }
+        return render(
+            request,
+            'courses/fragments/fragment_base.html',
+            context
         )
     elif fragment.type == 'quiz':
         correct_options = fragment.data.get('correct', [])
@@ -164,3 +195,21 @@ def submit_task(request, fragment_id):
             'courses/fragments/fragment_base.html',
             context,
         )
+
+@login_required
+def fragment_status(request, fragment_id):
+    attempt: TaskAttempt = TaskAttempt.objects.filter(
+        user=request.user,
+        fragment_id=fragment_id
+    ).order_by('-created_at').first()
+
+    if attempt:
+        data = {
+            'status': attempt.status,          # 'pending', 'success', 'failed', 'error', 'running'
+            'is_correct': attempt.is_correct,
+            'message': attempt.output or '',
+            'completed_at': attempt.completed_at.isoformat() if attempt.completed_at else None,
+        }
+    else:
+        data = {'status': 'none'}
+    return JsonResponse(data)

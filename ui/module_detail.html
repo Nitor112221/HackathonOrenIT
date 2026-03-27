@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}{{ module.title }}{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+    <a href="/modules">Все модули</a> / <span>{{ module.title }}</span>
+</div>
+
+<section class="module-header">
+    <h1>{{ module.title }}</h1>
+    <p>{{ module.description }}</p>
+    <div class="module-stats">
+        <span>Уроков: {{ module.total_lessons }}</span>
+        <span>Необходимо XP для завершения: {{ module.required_xp }}</span>
+        <div class="progress-bar">
+            <div class="progress-fill" ></div>
+        </div>
+        <span>Прогресс модуля: {{ module.progress }}%</span>
+    </div>
+</section>
+
+<section class="lessons-list">
+    <h2>Уроки модуля</h2>
+    <div class="lessons-grid">
+        {% for lesson in lessons %}
+        <div class="lesson-item" data-status="{{ lesson.status }}">
+            <div class="lesson-icon">
+                {% if lesson.completed %}
+                {% elif lesson.locked %}
+                {% else %}
+                {% endif %}
+            </div>
+            <div class="lesson-info">
+                <h3>{{ lesson.title }}</h3>
+                <p>{{ lesson.description }}</p>
+                <div class="lesson-meta">
+                    <span>{{ lesson.tasks_count }} заданий</span>
+                    <span>{{ lesson.xp_reward }} XP за прохождение</span>
+                </div>
+            </div>
+            <div class="lesson-action">
+                {% if lesson.locked %}
+                <button class="btn-disabled" disabled>Заблокирован</button>
+                {% elif lesson.completed %}
+                <a href="/lesson/{{ lesson.id }}/review" class="btn-outline">Повторить</a>
+                {% else %}
+                <a href="/lesson/{{ lesson.id }}" class="btn-primary">Начать урок</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="module-test-block">
+    <h3>Итоговый тест модуля</h3>
+    <p>Проверь свои знания по всему модулю. Для перехода к следующему модулю необходимо набрать 80%.</p>
+    {% if module_test_available %}
+    <a href="/module/{{ module.id }}/test" class="btn-accent">Пройти итоговый тест</a>
+    {% else %}
+    <button class="btn-disabled" disabled>Тест доступен после всех уроков</button>
+    {% endif %}
+</section>
+{% endblock %}

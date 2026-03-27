@@ -4,11 +4,11 @@
         <div class="card-text">
             {{ fragment.data.content|safe }}
         </div>
-        <button class="btn btn-success mt-3"
-                hx-post="{% url 'complete_fragment' fragment.id %}"
-                hx-target="#fragment-container"
-                hx-swap="innerHTML">
-            Отметить как пройденное
-        </button>
+        <form hx-post="{% url 'complete_fragment' fragment.id %}" hx-target="#fragment-container" hx-swap="innerHTML">
+            {% csrf_token %}
+            <button class="btn btn-success mt-3" type="submit">
+                Отметить как пройденное
+            </button>
+        </form>
     </div>
 </div>

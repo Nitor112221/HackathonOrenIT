@@ -14,7 +14,11 @@ class LessonAdmin(admin.ModelAdmin):
 class FragmentAdmin(admin.ModelAdmin):
     pass
 
+class UserFragmentProgressAdmin(admin.ModelAdmin):
+    pass
+
 
 admin.site.register(courses.models.Module, ModuleAdmin)
 admin.site.register(courses.models.Lesson, LessonAdmin)
 admin.site.register(courses.models.Fragment, FragmentAdmin)
+admin.site.register(courses.models.UserFragmentProgress, UserFragmentProgressAdmin)

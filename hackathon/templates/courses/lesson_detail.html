@@ -49,3 +49,31 @@
 }
 </style>
 {% endblock %}
+
+{% block extra_js %}
+<script>
+    function setActiveCircle(fragmentId) {
+        document.querySelectorAll('.fragment-circle').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.fragmentId == fragmentId) {
+                btn.classList.add('active');
+            }
+        });
+    }
+
+    document.querySelectorAll('.fragment-circle').forEach(btn => {
+        btn.addEventListener('click', function() {
+            setActiveCircle(this.dataset.fragmentId);
+        });
+    });
+
+    document.body.addEventListener('htmx:afterSwap', function(evt) {
+        if (evt.target.id === 'fragment-container') {
+            const newFragmentId = document.querySelector('#fragment-container [data-fragment-id]')?.dataset.fragmentId;
+            if (newFragmentId) {
+                setActiveCircle(newFragmentId);
+            }
+        }
+    });
+</script>
+{% endblock %}

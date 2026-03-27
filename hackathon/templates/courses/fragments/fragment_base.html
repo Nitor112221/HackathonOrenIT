@@ -1,6 +1,6 @@
 {% load static %}
 
-<div class="fragment-content">
+<div class="fragment-content" data-fragment-id="{{ fragment.id }}">
     {% if fragment.type == 'video' %}
         {% include 'courses/fragments/video.html' %}
     {% elif fragment.type == 'text' %}

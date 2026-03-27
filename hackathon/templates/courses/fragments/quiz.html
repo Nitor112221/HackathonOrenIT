@@ -3,7 +3,7 @@
         <h5 class="card-title">Викторина</h5>
         <form hx-post="{% url 'submit_task' fragment.id %}" hx-target="#fragment-container" hx-swap="innerHTML">
             {% csrf_token %}
-            {% for question in fragment.data.questions %}
+            {% with question=fragment.data %}
                 <div class="mb-3">
                     <p><strong>{{ question.text }}</strong></p>
                     {% for option in question.options %}
@@ -15,11 +15,16 @@
                         </div>
                     {% endfor %}
                 </div>
-            {% endfor %}
+            {% endwith %}
             <button type="submit" class="btn btn-primary">Ответить</button>
         </form>
         {% if error %}
             <div class="alert alert-danger mt-3">{{ error }}</div>
+        {% endif %}
+        {% if completed %}
+            <div class="alert alert-success">
+                Задание выполнено! Вы можете перейти к следующему фрагменту, нажав на кружок.
+            </div>
         {% endif %}
     </div>
 </div>

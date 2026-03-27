@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    # 'django.contrib.static',
     'django.contrib.staticfiles',
     # Installed applications
     # Project applications
@@ -129,6 +130,7 @@ USE_TZ = True
 
 
 STATIC_URL = 'static/'
+
 STATIC_DIR = BASE_DIR / 'static'
 STATICFILES_DIRS = []
 if STATIC_DIR.exists():

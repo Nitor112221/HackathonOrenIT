@@ -1,0 +1,22 @@
+{% load static %}
+
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">{{ fragment.data.title|default:"Видео лекция" }}</h5>
+        <div class="card-text">
+            <div class="ratio ratio-16x9">
+                <video controls preload="metadata">
+                    <source src="{% static fragment.data.url %}" type="video/mp4">
+                    Ваш браузер не поддерживает воспроизведение видео.
+                </video>
+            </div>
+        </div>
+        <form hx-post="{% url 'complete_fragment' fragment.id %}" hx-target="#fragment-container" hx-swap="innerHTML">
+            {% csrf_token %}
+            <button class="btn btn-success mt-3" type="submit">
+                Отметить как пройденное
+            </button>
+        </form>
+    </div>
+</div>

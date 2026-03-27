@@ -1,11 +1,11 @@
-from django.shortcuts import get_object_or_404, render
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, DetailView
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
+from django.views.generic import DetailView, ListView
 
-from courses.models import Module, Lesson, Fragment, UserFragmentProgress, TaskAttempt
+from courses.models import Fragment, Lesson, Module, TaskAttempt, UserFragmentProgress
 
 
 class ModuleListView(LoginRequiredMixin, ListView):
@@ -24,9 +24,13 @@ class LessonListView(LoginRequiredMixin, DetailView):
         lessons = self.object.lessons.all()
         for lesson in lessons:
             total = lesson.fragments.count()
-            completed = UserFragmentProgress.objects.filter(user=self.request.user, fragment__lesson=lesson,
-                                                            completed=True).count()
-            lesson.is_completed = (total > 0 and total == completed)
+            completed = UserFragmentProgress.objects.filter(
+                user=self.request.user,
+                fragment__lesson=lesson,
+                completed=True,
+            ).count()
+            lesson.is_completed = total > 0 and total == completed
+
         context['lessons'] = lessons
         return context
 
@@ -42,15 +46,16 @@ class LessonDetailView(LoginRequiredMixin, DetailView):
         completed_ids = UserFragmentProgress.objects.filter(
             user=self.request.user,
             fragment__in=fragments,
-            completed=True
+            completed=True,
         ).values_list('fragment_id', flat=True)
 
-        # Определяем текущий фрагмент: первый не пройденный или первый, если все пройдены
+        # Определяем текущий фрагмент
         current = None
         for frag in fragments:
             if frag.id not in completed_ids:
                 current = frag
                 break
+
         if current is None and fragments.exists():
             current = fragments.first()
 
@@ -65,7 +70,11 @@ def fragment_detail(request, fragment_id):
     fragment = get_object_or_404(Fragment, id=fragment_id)
     context = {
         'fragment': fragment,
-        'completed': UserFragmentProgress.objects.filter(user=request.user, fragment=fragment, completed=True).exists(),
+        'completed': UserFragmentProgress.objects.filter(
+            user=request.user,
+            fragment=fragment,
+            completed=True,
+        ).exists(),
     }
     return render(request, 'courses/fragments/fragment_base.html', context)
 
@@ -73,7 +82,10 @@ def fragment_detail(request, fragment_id):
 @login_required
 def complete_fragment(request, fragment_id):
     fragment = get_object_or_404(Fragment, id=fragment_id)
-    progress, created = UserFragmentProgress.objects.get_or_create(user=request.user, fragment=fragment)
+    progress, created = UserFragmentProgress.objects.get_or_create(
+        user=request.user,
+        fragment=fragment,
+    )
     if not progress.completed:
         progress.completed = True
         progress.completed_at = timezone.now()
@@ -81,7 +93,11 @@ def complete_fragment(request, fragment_id):
         request.user.total_xp += fragment.xp_reward
         request.user.save()
 
-    return render(request, 'courses/fragments/fragment_base.html', {'fragment': fragment})
+    return render(
+        request,
+        'courses/fragments/fragment_base.html',
+        {'fragment': fragment},
+    )
 
 
 @login_required
@@ -91,12 +107,14 @@ def submit_task(request, fragment_id):
     answer = request.POST.get('answer')
 
     is_correct = False
-    output = ''
     if fragment.type == 'code':
         # TODO добавить обработку посылок
         # Отправляем задачу в Celery
         # Здесь нужно отправить задачу в Celery, а пока вернём сообщение
-        return HttpResponse('<div class="alert alert-info">Код отправлен на проверку. Результат появится позже.</div>')
+        return HttpResponse(
+            '<div class="alert alert-info">Код отправлен на проверку. '
+            'Результат появится позже.</div>',
+        )
     elif fragment.type == 'quiz':
         correct_options = fragment.data.get('correct', [])
         selected = request.POST.getlist('options')
@@ -114,9 +132,12 @@ def submit_task(request, fragment_id):
             answer=answer,
             status='success',
             is_correct=True,
-            completed_at=timezone.now()
+            completed_at=timezone.now(),
         )
-        progress, _ = UserFragmentProgress.objects.get_or_create(user=user, fragment=fragment)
+        progress, _ = UserFragmentProgress.objects.get_or_create(
+            user=user,
+            fragment=fragment,
+        )
         if not progress.completed:
             progress.completed = True
             progress.completed_at = timezone.now()
@@ -124,11 +145,19 @@ def submit_task(request, fragment_id):
             user.total_xp += fragment.xp_reward
             user.save()
 
-        return render(request, 'courses/fragments/fragment_base.html', {'fragment': fragment})
+        return render(
+            request,
+            'courses/fragments/fragment_base.html',
+            {'fragment': fragment},
+        )
     else:
         context = {
             'fragment': fragment,
             'error': 'Ответ неверный, попробуйте ещё раз',
             'completed': False,
         }
-        return render(request, 'courses/fragments/fragment_base.html', context)
+        return render(
+            request,
+            'courses/fragments/fragment_base.html',
+            context,
+        )

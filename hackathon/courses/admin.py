@@ -14,6 +14,7 @@ class LessonAdmin(admin.ModelAdmin):
 class FragmentAdmin(admin.ModelAdmin):
     pass
 
+
 class UserFragmentProgressAdmin(admin.ModelAdmin):
     pass
 

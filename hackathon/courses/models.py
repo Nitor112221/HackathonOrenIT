@@ -1,5 +1,5 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 
 
 class Module(models.Model):
@@ -26,7 +26,7 @@ class Lesson(models.Model):
         unique_together = ['module', 'order']
 
     def __str__(self):
-        return f"{self.module.title} - {self.title}"
+        return f'{self.module.title} - {self.title}'
 
 
 class Fragment(models.Model):
@@ -37,7 +37,11 @@ class Fragment(models.Model):
         ('quiz', 'Викторина'),
         ('short_answer', 'Краткий ответ'),
     )
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='fragments')
+    lesson = models.ForeignKey(
+        Lesson,
+        on_delete=models.CASCADE,
+        related_name='fragments',
+    )
     order = models.PositiveIntegerField(default=0)
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     data = models.JSONField(default=dict)  # структура зависит от type
@@ -48,14 +52,25 @@ class Fragment(models.Model):
         unique_together = ['lesson', 'order']
 
     def __str__(self):
-        return f"{self.lesson.title} - {self.get_type_display()} ({self.order})"
+        return f'{self.lesson.title} - {self.get_type_display()} ({self.order})'
 
 
 class UserFragmentProgress(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='fragment_progress')
-    fragment = models.ForeignKey(Fragment, on_delete=models.CASCADE, related_name='user_progress')
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='fragment_progress',
+    )
+    fragment = models.ForeignKey(
+        Fragment,
+        on_delete=models.CASCADE,
+        related_name='user_progress',
+    )
     completed = models.BooleanField(default=False)
-    completed_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         unique_together = ['user', 'fragment']
@@ -68,8 +83,16 @@ class TaskAttempt(models.Model):
         ('success', 'Успешно'),
         ('failure', 'Ошибка'),
     )
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='task_attempts')
-    fragment = models.ForeignKey(Fragment, on_delete=models.CASCADE, related_name='attempts')
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='task_attempts',
+    )
+    fragment = models.ForeignKey(
+        Fragment,
+        on_delete=models.CASCADE,
+        related_name='attempts',
+    )
     answer = models.JSONField(default=dict)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     output = models.TextField(blank=True)
@@ -78,4 +101,4 @@ class TaskAttempt(models.Model):
     completed_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.fragment} - {self.status}"
+        return f'{self.user.username} - {self.fragment} - {self.status}'

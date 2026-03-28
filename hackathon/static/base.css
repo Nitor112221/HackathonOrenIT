@@ -25,7 +25,6 @@ body {
     flex-wrap: wrap;
     gap: 1rem;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    /* Убираем justify-content: space-between, чтобы управлять расположением вручную */
 }
 
 .logo a {
@@ -50,7 +49,6 @@ body {
     display: flex;
     gap: 1.5rem;
     flex-wrap: wrap;
-    /* margin-right: auto отправляет все последующие элементы (user-info) вправо */
     margin-right: auto;
 }
 
@@ -137,7 +135,7 @@ body {
     }
 
     .main-nav {
-        margin-right: 0; /* отменяем auto отступ на мобильных */
+        margin-right: 0;
         justify-content: center;
     }
 
@@ -151,7 +149,7 @@ body {
     }
 }
 
-/* Дополнительные стили для контентных блоков (можно расширять) */
+/* ========== КАРТОЧКА (общий стиль) ========== */
 .card {
     background-color: white;
     border-radius: 8px;
@@ -160,12 +158,71 @@ body {
     margin-bottom: 1.5rem;
 }
 
-h1, h2, h3 {
-    margin-bottom: 1rem;
+/* ========== СТИЛИ ДЛЯ СТРАНИЦЫ ВХОДА ========== */
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 450px;
+    padding: 2rem;
+}
+
+.card-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.card-title {
+    font-size: 1.8rem;
+    margin-bottom: 0;
     color: #2c3e50;
 }
 
-button, .btn {
+.register-link {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.register-link a {
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.register-link a:hover {
+    color: #2980b9;
+    text-decoration: underline;
+}
+
+/* Форма */
+.login-form .form-group {
+    margin-bottom: 1rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-control:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* Кнопка */
+.btn {
+    display: inline-block;
     background-color: #3498db;
     color: white;
     border: none;
@@ -173,8 +230,48 @@ button, .btn {
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s;
+    font-size: 1rem;
+    text-align: center;
 }
 
-button:hover, .btn:hover {
+.btn:hover {
     background-color: #2980b9;
+}
+
+.btn-block {
+    width: 100%;
+    display: block;
+}
+
+/* Сообщение об ошибке */
+.alert {
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Утилиты (используются в шаблоне) */
+.mb-0 {
+    margin-bottom: 0;
+}
+
+.mb-3 {
+    margin-bottom: 1rem;
+}
+
+.d-grid {
+    display: grid;
+}
+
+/* Дополнительные стили для контентных блоков */
+h1, h2, h3 {
+    margin-bottom: 1rem;
+    color: #2c3e50;
 }

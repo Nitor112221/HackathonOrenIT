@@ -31,7 +31,7 @@ urlpatterns = [
 
 
 if django.conf.settings.DEBUG:
-    import debug_toolbar.toolbar
+    # import debug_toolbar.toolbar
 
     # urlpatterns += debug_toolbar.toolbar.debug_toolbar_urls()
 

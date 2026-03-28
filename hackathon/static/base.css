@@ -1,0 +1,180 @@
+/* Базовый сброс и настройки */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Шапка сайта — тёмно-серый фон */
+.app-header {
+    background-color: #2c2c2c;
+    color: #ecf0f1;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    /* Убираем justify-content: space-between, чтобы управлять расположением вручную */
+}
+
+.logo a {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ecf0f1;
+    text-decoration: none;
+    transition: opacity 0.3s;
+}
+
+.logo a:hover {
+    opacity: 0.8;
+}
+
+/* Пустой логотип в исходном шаблоне — добавим текст по умолчанию */
+.logo a::before {
+    content: "CodeLand";
+}
+
+/* Навигация — прижимаем к логотипу слева */
+.main-nav {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    /* margin-right: auto отправляет все последующие элементы (user-info) вправо */
+    margin-right: auto;
+}
+
+.main-nav a {
+    color: #ecf0f1;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.main-nav a:hover {
+    color: #3498db;
+}
+
+/* Блок пользователя — остаётся справа */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.username {
+    font-weight: bold;
+}
+
+.level, .xp {
+    font-size: 0.9rem;
+    background-color: #34495e;
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+}
+
+.logout-btn, .login-btn {
+    background-color: #e74c3c;
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.logout-btn:hover {
+    background-color: #c0392b;
+}
+
+.login-btn {
+    background-color: #3498db;
+}
+
+.login-btn:hover {
+    background-color: #2980b9;
+}
+
+/* Основной контент */
+.main-content {
+    flex: 1;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+    width: 100%;
+}
+
+/* Футер — тёмно-серый фон */
+.app-footer {
+    background-color: #2c2c2c;
+    color: #ecf0f1;
+    text-align: center;
+    padding: 1.5rem;
+    margin-top: auto;
+}
+
+.footer-content p {
+    font-size: 0.9rem;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+    .app-header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+
+    .main-nav {
+        margin-right: 0; /* отменяем auto отступ на мобильных */
+        justify-content: center;
+    }
+
+    .user-info {
+        justify-content: center;
+    }
+
+    .main-content {
+        padding: 0 1rem;
+        margin: 1rem auto;
+    }
+}
+
+/* Дополнительные стили для контентных блоков (можно расширять) */
+.card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+h1, h2, h3 {
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+button, .btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover, .btn:hover {
+    background-color: #2980b9;
+}

@@ -22,7 +22,7 @@
   "pk": 5,
   "fields": {
     "password": "pbkdf2_sha256$1000000$VuK1nbmIzE615YXbyzhK4D$zXGPheydBxvN1ytyubY5L5vk3pwYQeqCQn2BT6JCo10=",
-    "last_login": "2026-03-27T10:03:13.364Z",
+    "last_login": "2026-03-28T13:32:31.206Z",
     "is_superuser": true,
     "username": "admin2",
     "first_name": "",
@@ -36,11 +36,55 @@
   }
 },
 {
-  "model": "sessions.session",
-  "pk": "6y74tmt4neiehbyb6hrbo146pj3c30vj",
+  "model": "auth.user",
+  "pk": 6,
   "fields": {
-    "session_data": ".eJxVjEEOwiAQRe_C2pBCGWBcuvcMZGCoVA0kpV0Z765NutDtf-_9lwi0rSVsPS9hZnEWIE6_W6T0yHUHfKd6azK1ui5zlLsiD9rltXF-Xg7376BQL986WedjNoQqerTOKGLOFkGDVhmjUjQa4wFGcgmHaGGyzKi0mezocGDx_gDUCDcr:1w6425:ixMXzmhb5J70KCb8zrXvu1_J_beKsRKu98UvvyquWrA",
-    "expire_date": "2026-04-10T10:03:13.375Z"
+    "password": "pbkdf2_sha256$1000000$ZLd4bxqCCImRml443Fo3cU$RvcF6rJqFwJkcObzJ1OL/Y+1qXBpLtStDna9fiMr6zE=",
+    "last_login": "2026-03-28T08:52:28.240Z",
+    "is_superuser": false,
+    "username": "test123",
+    "first_name": "",
+    "last_name": "",
+    "email": "test@gmail.test",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-03-28T08:52:21.109Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 7,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$esWg8uHTvjaBReKMG7Lnti$HCc/GwemVOGWTRgigIYsE0SnCnWtXo9sxkTtVN5gtnY=",
+    "last_login": "2026-03-28T08:55:31.730Z",
+    "is_superuser": false,
+    "username": "abc",
+    "first_name": "",
+    "last_name": "",
+    "email": "abc@abc.abc",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-03-28T08:55:28.642Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "t2imuiz2i1rbkzudcfyxsje22i5kvijq",
+  "fields": {
+    "session_data": ".eJxVjEEOgjAURO_StWk-LQXq0r1naP70F4uaklBYGe-uJCx0O--9eanA25rDVtMSJlFn1avT7waOj1R2IHcut1nHuazLBL0r-qBVX2dJz8vh_h1krvlbt4bENg5wLGMH66KIs6DGt4xBnBEhssZCQDGlnhlA50G-HcZeSL0__mc4zg:1w6PS7:LwwaFb1GvhaDM2-V6zKPxuFDVvrHnHBKFrMvDyofiwg",
+    "expire_date": "2026-04-11T08:55:31.742Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "zwbiaq89mijvquks5f4raf10vwhsbjq4",
+  "fields": {
+    "session_data": ".eJxVjEEOwiAQRe_C2hDoUECX7nsGAjODVA0kpV0Z765NutDtf-_9lwhxW0vYOi9hJnERozj9binig-sO6B7rrUlsdV3mJHdFHrTLqRE_r4f7d1BiL9-ac7JoPcFZeSTlrFHGQLLkAXFEZzIN1hqnssasCRK7gXJWUXvFACzeH-1IODU:1w6TmB:GH-YyejZ-VhduHFWT5Sp8STbFqLf60Ousz9L38fiQh0",
+    "expire_date": "2026-04-11T13:32:31.218Z"
   }
 },
 {
@@ -48,7 +92,9 @@
   "pk": 1,
   "fields": {
     "user": 4,
-    "total_xp": 0
+    "total_xp": 0,
+    "last_activity_date": null,
+    "current_streak": 0
   }
 },
 {
@@ -56,7 +102,57 @@
   "pk": 2,
   "fields": {
     "user": 5,
-    "total_xp": 50
+    "total_xp": 900,
+    "last_activity_date": "2026-03-28",
+    "current_streak": 1
+  }
+},
+{
+  "model": "users.profile",
+  "pk": 3,
+  "fields": {
+    "user": 6,
+    "total_xp": 400,
+    "last_activity_date": "2026-03-28",
+    "current_streak": 1
+  }
+},
+{
+  "model": "users.profile",
+  "pk": 4,
+  "fields": {
+    "user": 7,
+    "total_xp": 350,
+    "last_activity_date": "2026-03-28",
+    "current_streak": 1
+  }
+},
+{
+  "model": "gamification.achievement",
+  "pk": 1,
+  "fields": {
+    "name": "Первые шаги",
+    "description": "Пройдите первую урок",
+    "icon": "achievements/img.png",
+    "criteria": {
+      "type": "lessons_completed",
+      "value": 1
+    },
+    "xp_reward": 50
+  }
+},
+{
+  "model": "gamification.achievement",
+  "pk": 2,
+  "fields": {
+    "name": "Код не кот",
+    "description": "Решите первую задачу на код",
+    "icon": "achievements/img_1.png",
+    "criteria": {
+      "type": "code_tasks_solved",
+      "value": 1
+    },
+    "xp_reward": 100
   }
 },
 {
@@ -154,71 +250,25 @@
   }
 },
 {
-  "model": "courses.userfragmentprogress",
-  "pk": 22,
+  "model": "courses.fragment",
+  "pk": 5,
   "fields": {
-    "user": 5,
-    "fragment": 1,
-    "completed": true,
-    "completed_at": "2026-03-27T10:04:15.088Z"
-  }
-},
-{
-  "model": "courses.userfragmentprogress",
-  "pk": 23,
-  "fields": {
-    "user": 5,
-    "fragment": 4,
-    "completed": true,
-    "completed_at": "2026-03-27T10:04:22.535Z"
-  }
-},
-{
-  "model": "courses.userfragmentprogress",
-  "pk": 24,
-  "fields": {
-    "user": 5,
-    "fragment": 2,
-    "completed": true,
-    "completed_at": "2026-03-27T10:04:23.836Z"
-  }
-},
-{
-  "model": "courses.userfragmentprogress",
-  "pk": 25,
-  "fields": {
-    "user": 5,
-    "fragment": 3,
-    "completed": true,
-    "completed_at": "2026-03-27T10:04:26.392Z"
-  }
-},
-{
-  "model": "courses.taskattempt",
-  "pk": 34,
-  "fields": {
-    "user": 5,
-    "fragment": 1,
-    "answer": "[0]",
-    "status": "success",
-    "output": "",
-    "is_correct": true,
-    "created_at": "2026-03-27T10:04:15.079Z",
-    "completed_at": "2026-03-27T10:04:15.078Z"
-  }
-},
-{
-  "model": "courses.taskattempt",
-  "pk": 35,
-  "fields": {
-    "user": 5,
-    "fragment": 4,
-    "answer": "4",
-    "status": "success",
-    "output": "",
-    "is_correct": true,
-    "created_at": "2026-03-27T10:04:22.526Z",
-    "completed_at": "2026-03-27T10:04:22.525Z"
+    "lesson": 1,
+    "order": 4,
+    "type": "code",
+    "data": {
+      "author_solve": "def solve(a, b):\n    return a + b\n\nif __name__ == '__main__':\n    import sys\n    data = sys.stdin.read().strip().split()\n    if not data:\n        sys.exit()\n    a = int(data[0])\n    b = int(data[1])\n    print(solve(a, b))",
+      "checker_code": "import sys\n\ndef main():\n    with open(sys.argv[1], 'r') as f_user:\n        user_out = f_user.read().strip()\n    with open(sys.argv[2], 'r') as f_author:\n        author_out = f_author.read().strip()\n    if user_out == author_out:\n        print('OK')\n    else:\n        print(f'Expected {author_out}, got {user_out}')\n\nif __name__ == '__main__':\n    main()",
+      "test_cases": [
+        "2 3\n",
+        "10 -4\n",
+        "0 0\n"
+      ],
+      "time_limit": 2,
+      "memory_limit": 128,
+      "description": "Напишите программу, которая читает два целых числа и выводит их сумму."
+    },
+    "xp_reward": 200
   }
 }
 ]

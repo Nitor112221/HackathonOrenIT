@@ -1,40 +1,21 @@
 # Проект для хакатона Орен ИТ
 
-### Команды для запуска
+## Установка и запуск
 
-## Создание виртуального окружения для проекта:
-* Создание виртуального окружения: 
-```bash
-python3 -m venv .venv
-```
-* Активация виртуального окружения (Linux):
-```bash
-source .venv/bin/activate
-```
-* Активация виртуального окружения (Windows):
-```bash
-.venv/Scripts/activate
-```
-## Установка зависимостей
-* Зависимости для разработки: 
-```bash
-pip install -r requirements/dev.txt
-```
-
-## Запуск
+### 1. Клонирование репозитория
 
 ```bash
-cd hackathon
+git clone https://github.com/Nitor112221/HackathonOrenIT
+cd HackathonOrenIT
 ```
 
+### 2. Создание виртуального окружения
+Windows:
 ```bash
-python manage.py migrate
+python -m venv venv
+venv\Scripts\activate
 ```
-
+Linux
 ```bash
-python manage.py loaddata fixtures/data.json
-```
 
-```bash
-python manage.py runserver
 ```

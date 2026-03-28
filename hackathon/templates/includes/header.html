@@ -3,8 +3,11 @@
         <a href="/"></a>
     </div>
     <nav class="main-nav">
+        {% if user.is_authenticated %}
         <a href="/modules">Модули</a>
         <a href="{% url 'profile' %}">Профиль</a>
+        {% else %}
+        {% endif %}
     </nav>
     <div class="user-info">
         {% if user.is_authenticated %}

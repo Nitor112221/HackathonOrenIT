@@ -10,27 +10,7 @@
           hx-swap="innerHTML"
           id="code-form">
         {% csrf_token %}
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
-            <textarea name="answer" id="code-editor" rows="12" cols="80" placeholder="Введите">{{ user_code|default:'' }}</textarea>
-            <script>
-                var editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
-                    lineNumbers: true,
-                    mode: 'python',
-                    indentUnit: 4,
-                    tabSize: 4,
-                    indentWithTabs: false,
-                    extraKeys: {
-                        Tab: function(cm) {
-                            cm.replaceSelection('    ', 'end');
-                        }
-                    }
-                });
-                document.getElementById('code-form').addEventListener('submit', function() {
-                    editor.save();
-                });
-            </script>
+        <textarea name="answer" rows="12" cols="80" placeholder="Введите ваш код на Python">{{ user_code|default:'' }}</textarea>
         <br>
         <button type="submit" {% if pending %}disabled{% endif %}>Отправить на проверку</button>
     </form>

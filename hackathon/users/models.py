@@ -34,11 +34,13 @@ class Profile(django.db.models.Model):
         if self.last_activity_date == today:
             # Уже обновлено сегодня, ничего не меняем
             return
+
         if self.last_activity_date == today - timezone.timedelta(days=1):
             # Продолжаем серию
             self.current_streak += 1
         else:
             self.current_streak = 1
+
         self.last_activity_date = today
         self.save()
 

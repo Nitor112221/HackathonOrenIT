@@ -53,7 +53,7 @@ def run_user_code_in_docker(
         runner_path = os.path.join(temp_dir, 'code_runner.py')
         shutil.copy('core/code_runner.py', runner_path)
         if not os.path.exists(runner_path):
-            raise FileNotFoundError(f"code_runner.py not found 2")
+            raise FileNotFoundError('code_runner.py not found 2')
 
         # Подготавливаем тесты для передачи через окружение
         tests_json = json.dumps(tests)
@@ -81,7 +81,6 @@ def run_user_code_in_docker(
             'python:3',
             'python',
             '/mnt/code_runner.py',
-
         ]
         proc = subprocess.run(
             cmd,
@@ -98,6 +97,7 @@ def run_user_code_in_docker(
                 'test_error': 1,
                 'message': f'Некорректный вывод чекера: {proc}',
             }
+
         if result['status'] == 'AC':
             attempt.status = 'success'
             attempt.is_correct = True
@@ -129,10 +129,18 @@ def run_user_code_in_docker(
 
                 lesson = fragment.lesson
                 total_fragments = lesson.fragments.count()
-                completed_fragments = courses.models.UserFragmentProgress.objects.filter(user=user, fragment__lesson=lesson,
-                                                                                  completed=True).count()
+                completed_fragments = (
+                    courses.models.UserFragmentProgress.objects.filter(
+                        user=user,
+                        fragment__lesson=lesson,
+                        completed=True,
+                    ).count()
+                )
                 if total_fragments == completed_fragments:
-                    lesson_progress, _ = UserLessonProgress.objects.get_or_create(user=user, lesson=lesson)
+                    lesson_progress, _ = UserLessonProgress.objects.get_or_create(
+                        user=user,
+                        lesson=lesson,
+                    )
                     if not lesson_progress.completed:
                         lesson_progress.completed = True
                         lesson_progress.completed_at = timezone.now()

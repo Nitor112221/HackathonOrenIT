@@ -89,12 +89,6 @@ def run_checker(
 
 
 def main():
-    # print({
-    #     'status': 'AC',
-    #     'test_error': None,
-    #     'message': None,
-    # })
-
     tests = os.getenv('TESTS')
     tests_parsed = json.loads(tests)
     user_code = os.getenv('USER_CODE')
@@ -136,6 +130,7 @@ def main():
         result['message'] = 'Неправильный ответ'
 
     print(json.dumps(result))
+
 
 if __name__ == '__main__':
     main()

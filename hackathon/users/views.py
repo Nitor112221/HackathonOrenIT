@@ -1,11 +1,11 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import DetailView, FormView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import get_object_or_404
-from gamification.models import Achievement, UserAchievement
 
+from gamification.models import Achievement, UserAchievement
 from users.forms import SignUpForm
 
 
@@ -30,6 +30,7 @@ class ProfileView(LoginRequiredMixin, DetailView):
         username = self.kwargs.get('username')
         if username:
             return get_object_or_404(User, username=username)
+
         return self.request.user
 
     def get_context_data(self, **kwargs):
@@ -39,10 +40,13 @@ class ProfileView(LoginRequiredMixin, DetailView):
         context['profile'] = profile
         context['level'] = profile.get_level()
         context['next_level_xp'] = profile.get_next_level_xp()
-        context['xp_percent'] = (profile.total_xp % 100)
+        context['xp_percent'] = profile.total_xp % 100
 
         all_achievements = Achievement.objects.all()
-        earned_ids = UserAchievement.objects.filter(user=user).values_list('achievement_id', flat=True)
+        earned_ids = UserAchievement.objects.filter(user=user).values_list(
+            'achievement_id',
+            flat=True,
+        )
         earned_achievements = Achievement.objects.filter(id__in=earned_ids)
         context['all_achievements'] = all_achievements
         context['earned_achievements'] = earned_achievements

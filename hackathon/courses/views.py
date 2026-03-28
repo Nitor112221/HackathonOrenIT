@@ -108,10 +108,16 @@ def complete_fragment(request, fragment_id):
 
         lesson = fragment.lesson
         total_fragments = lesson.fragments.count()
-        completed_fragments = UserFragmentProgress.objects.filter(user=user, fragment__lesson=lesson,
-                                                                  completed=True).count()
+        completed_fragments = UserFragmentProgress.objects.filter(
+            user=user,
+            fragment__lesson=lesson,
+            completed=True,
+        ).count()
         if total_fragments == completed_fragments:
-            lesson_progress, _ = UserLessonProgress.objects.get_or_create(user=user, lesson=lesson)
+            lesson_progress, _ = UserLessonProgress.objects.get_or_create(
+                user=user,
+                lesson=lesson,
+            )
             if not lesson_progress.completed:
                 lesson_progress.completed = True
                 lesson_progress.completed_at = timezone.now()
@@ -120,7 +126,10 @@ def complete_fragment(request, fragment_id):
         new_achievements = check_achievements(user)
 
         for ach in new_achievements:
-            messages.success(request, f'Новое достижение: {ach.name}! +{ach.xp_reward} XP')
+            messages.success(
+                request,
+                f'Новое достижение: {ach.name}! +{ach.xp_reward} XP',
+            )
 
     return render(
         request,
@@ -206,10 +215,16 @@ def submit_task(request, fragment_id):
 
             lesson = fragment.lesson
             total_fragments = lesson.fragments.count()
-            completed_fragments = UserFragmentProgress.objects.filter(user=user, fragment__lesson=lesson,
-                                                                      completed=True).count()
+            completed_fragments = UserFragmentProgress.objects.filter(
+                user=user,
+                fragment__lesson=lesson,
+                completed=True,
+            ).count()
             if total_fragments == completed_fragments:
-                lesson_progress, _ = UserLessonProgress.objects.get_or_create(user=user, lesson=lesson)
+                lesson_progress, _ = UserLessonProgress.objects.get_or_create(
+                    user=user,
+                    lesson=lesson,
+                )
                 if not lesson_progress.completed:
                     lesson_progress.completed = True
                     lesson_progress.completed_at = timezone.now()
@@ -218,7 +233,10 @@ def submit_task(request, fragment_id):
             new_achievements = check_achievements(user)
 
             for ach in new_achievements:
-                messages.success(request, f'Новое достижение: {ach.name}! +{ach.xp_reward} XP')
+                messages.success(
+                    request,
+                    f'Новое достижение: {ach.name}! +{ach.xp_reward} XP',
+                )
 
         return render(
             request,

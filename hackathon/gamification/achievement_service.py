@@ -1,5 +1,5 @@
-from courses.models import TaskAttempt, UserFragmentProgress, Module
-from gamification.models import UserLessonProgress, UserAchievement, Achievement
+from courses.models import Module, TaskAttempt, UserFragmentProgress
+from gamification.models import Achievement, UserAchievement, UserLessonProgress
 
 
 def evaluate_achievement(achievement: Achievement, user):
@@ -7,13 +7,20 @@ def evaluate_achievement(achievement: Achievement, user):
     ctype = criteria.get('type')
     if ctype == 'xp_total':
         return user.profile.total_xp >= criteria['value']
-    elif ctype == 'lessons_completed':
+
+    if ctype == 'lessons_completed':
         count = UserLessonProgress.objects.filter(user=user, completed=True).count()
         return count >= criteria['value']
-    elif ctype == 'code_tasks_solved':
-        count = TaskAttempt.objects.filter(user=user, fragment__type='code', is_correct=True).count()
+
+    if ctype == 'code_tasks_solved':
+        count = TaskAttempt.objects.filter(
+            user=user,
+            fragment__type='code',
+            is_correct=True,
+        ).count()
         return count >= criteria['value']
-    elif ctype == 'fragment_type':
+
+    if ctype == 'fragment_type':
         # количество пройденных фрагментов определённого типа
         count = UserFragmentProgress.objects.filter(
             user=user,
@@ -21,18 +28,26 @@ def evaluate_achievement(achievement: Achievement, user):
             fragment__type=criteria['fragment_type'],
         ).count()
         return count >= criteria['count']
-    elif ctype == 'module_completed':
+
+    if ctype == 'module_completed':
         # проверяем, что все уроки модуля пройдены
         module = Module.objects.get(id=criteria['module_id'])
         lessons = module.lessons.all()
-        completed_lessons = UserLessonProgress.objects.filter(user=user, lesson__in=lessons, completed=True).count()
+        completed_lessons = UserLessonProgress.objects.filter(
+            user=user,
+            lesson__in=lessons,
+            completed=True,
+        ).count()
         return completed_lessons == lessons.count()
 
     return False
 
 
 def check_achievements(user):
-    earned_ids = UserAchievement.objects.filter(user=user).values_list('achievement_id', flat=True)
+    earned_ids = UserAchievement.objects.filter(user=user).values_list(
+        'achievement_id',
+        flat=True,
+    )
     pending = Achievement.objects.exclude(id__in=earned_ids)
     new_achievements = []
     for achievement in pending:

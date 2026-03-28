@@ -5,6 +5,7 @@ from django.contrib.auth.models import User as AuthUser
 from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
+from django.utils import timezone
 
 if 'makemigrations' not in sys.argv and 'migrate' not in sys.argv:
     AuthUser._meta.get_field('email')._unique = True
@@ -23,6 +24,23 @@ class Profile(django.db.models.Model):
     )
 
     total_xp = django.db.models.IntegerField(default=0, verbose_name='всего опыта')
+
+    last_activity_date = django.db.models.DateField(null=True, blank=True)
+    current_streak = django.db.models.IntegerField(default=0)
+
+    def update_streak(self):
+        """Обновляет серию активных дней"""
+        today = timezone.now().date()
+        if self.last_activity_date == today:
+            # Уже обновлено сегодня, ничего не меняем
+            return
+        if self.last_activity_date == today - timezone.timedelta(days=1):
+            # Продолжаем серию
+            self.current_streak += 1
+        else:
+            self.current_streak = 1
+        self.last_activity_date = today
+        self.save()
 
     def get_level(self):
         return self.total_xp // 100 + 1

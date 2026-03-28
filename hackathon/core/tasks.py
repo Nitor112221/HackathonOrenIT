@@ -121,6 +121,7 @@ def run_user_code_in_docker(
                 progress.completed_at = timezone.now()
                 progress.save()
                 user.profile.total_xp += fragment.xp_reward
+                user.profile.update_streak()
                 user.profile.save()
 
                 lesson = fragment.lesson

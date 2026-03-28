@@ -98,10 +98,12 @@ def complete_fragment(request, fragment_id):
         fragment=fragment,
     )
     if not progress.completed:
+
         progress.completed = True
         progress.completed_at = timezone.now()
         progress.save()
         request.user.profile.total_xp += fragment.xp_reward
+        request.user.profile.update_streak()
         request.user.profile.save()
 
         lesson = fragment.lesson
@@ -199,6 +201,7 @@ def submit_task(request, fragment_id):
             progress.completed_at = timezone.now()
             progress.save()
             user.profile.total_xp += fragment.xp_reward
+            user.profile.update_streak()
             user.profile.save()
 
             lesson = fragment.lesson

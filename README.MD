@@ -48,17 +48,22 @@ cp template.env .env
 python manage.py migrate
 ```
 
-### 7. Запуск Redis в Docker
+### 7. Загрузите заготовленные данные (модули, уроки, задания)
+```bash
+python manage.py loaddata fixtures/data.json
+```
+
+### 8. Запуск Redis в Docker
 ```bash
 docker run -d --name redis -p 6379:6379 redis:7-alpine
 ```
 
-### 8. Запуск Celery worker
+### 9. Запуск Celery worker
 ```bash
 celery -A hackathon worker --loglevel=info -P prefork
 ```
 
-### 9 Запуск Запуск Django server (в другом терминале из папки hackathon)
+### 10 Запуск Запуск Django server (в другом терминале из папки hackathon)
 ```bash
 python manage.py runserver
 ```

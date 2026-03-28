@@ -81,7 +81,6 @@ def run_checker(
                 check=True,
                 text=True,
                 capture_output=True,
-                timeout=time_limit,
             )
             if 'OK' not in process.stdout:
                 return 'WA', i
@@ -89,7 +88,13 @@ def run_checker(
             return 'Fail', i
 
 
-if __name__ == '__main__':
+def main():
+    # print({
+    #     'status': 'AC',
+    #     'test_error': None,
+    #     'message': None,
+    # })
+
     tests = os.getenv('TESTS')
     tests_parsed = json.loads(tests)
     user_code = os.getenv('USER_CODE')
@@ -101,7 +106,7 @@ if __name__ == '__main__':
     result = run_code(user_code, 'user', tests_parsed, time_limit, memory_limit)
     if result['status'] != 'AC':
         print(json.dumps(result))
-        exit()
+        return
 
     result_auth = run_code(
         author_code,
@@ -115,12 +120,12 @@ if __name__ == '__main__':
         result['message'] = 'Testing error, problem on our side'
         result['test_error'] = result_auth['test_error'] + 1
         print(json.dumps(result))
-        exit()
+        return
 
     res = run_checker(checker, len(tests_parsed))
     if res is None:
         print(json.dumps(result))
-        exit()
+        return
 
     result['status'] = res[0]
     result['test_error'] = res[1] + 1
@@ -131,3 +136,6 @@ if __name__ == '__main__':
         result['message'] = 'Неправильный ответ'
 
     print(json.dumps(result))
+
+if __name__ == '__main__':
+    main()

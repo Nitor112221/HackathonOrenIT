@@ -4,3 +4,4 @@ gevent==24.11.1 # for celery on windows
 pillow==12.1.1
 python-dotenv~=1.0.1
 redis==7.4.0
+supervisor

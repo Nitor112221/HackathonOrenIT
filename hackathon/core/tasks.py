@@ -1,4 +1,5 @@
 import json
+import os
 import shutil
 import subprocess
 import tempfile
@@ -49,7 +50,10 @@ def run_user_code_in_docker(
     attempt.save()
     temp_dir = tempfile.mkdtemp()
     try:
-        shutil.copy('core/code_runner.py', temp_dir)
+        runner_path = os.path.join(temp_dir, 'code_runner.py')
+        shutil.copy('core/code_runner.py', runner_path)
+        if not os.path.exists(runner_path):
+            raise FileNotFoundError(f"code_runner.py not found 2")
 
         # Подготавливаем тесты для передачи через окружение
         tests_json = json.dumps(tests)
@@ -59,7 +63,7 @@ def run_user_code_in_docker(
             'run',
             '--rm',
             '-v',
-            f'{temp_dir}:/mnt',
+            f'{temp_dir}:/mnt/',
             '--memory',
             f'{memory_limit}m',  # ограничение памяти
             '-e',
@@ -77,6 +81,7 @@ def run_user_code_in_docker(
             'python:3',
             'python',
             '/mnt/code_runner.py',
+
         ]
         proc = subprocess.run(
             cmd,
@@ -84,17 +89,15 @@ def run_user_code_in_docker(
             text=True,
             timeout=time_limit * len(tests) * 3 + 5,
         )
-
         try:
             output = proc.stdout.strip()
             result = json.loads(output)
         except json.JSONDecodeError:
             result = {
                 'status': 'Fail',
-                'test_error': None,
-                'message': f'Invalid output from runner: {output}',
+                'test_error': 1,
+                'message': f'Некорректный вывод чекера: {proc}',
             }
-
         if result['status'] == 'AC':
             attempt.status = 'success'
             attempt.is_correct = True

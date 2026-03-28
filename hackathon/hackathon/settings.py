@@ -29,7 +29,7 @@ def get_env_bool(key: str, default: str = 'true') -> bool:
     )
 
 
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'YOUR_KEY')
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'fake')
 DEBUG = get_env_bool('DJANGO_DEBUG')
 ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '*').split(',')
 

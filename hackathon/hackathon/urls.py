@@ -33,7 +33,7 @@ urlpatterns = [
 if django.conf.settings.DEBUG:
     import debug_toolbar.toolbar
 
-    urlpatterns += debug_toolbar.toolbar.debug_toolbar_urls()
+    # urlpatterns += debug_toolbar.toolbar.debug_toolbar_urls()
 
     urlpatterns += static(
         django.conf.settings.STATIC_URL,

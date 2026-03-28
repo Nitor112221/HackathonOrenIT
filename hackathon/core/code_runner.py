@@ -1,7 +1,7 @@
 import json
 import os
-import subprocess
 from pathlib import Path
+import subprocess
 from typing import Tuple
 
 
@@ -10,7 +10,7 @@ def run_code(code, folder, tests, time_limit, memory_limit):
     file.touch()
     code = code.replace('\\n', '\n')
     code = code.replace("'\\''", "'")
-    code = code.replace("\\'", "")
+    code = code.replace("\\'", '')
     file.write_text(code)
 
     folder = Path(folder)
@@ -54,12 +54,17 @@ def run_code(code, folder, tests, time_limit, memory_limit):
     return result
 
 
-def run_checker(code_checker, test_count, folder_user="user", folder_author="author") -> Tuple[str, int] | None:
+def run_checker(
+    code_checker,
+    test_count,
+    folder_user='user',
+    folder_author='author',
+) -> Tuple[str, int] | None:
     file = Path('checker.py')
     file.touch()
     code_checker = code_checker.replace('\\n', '\n')
     code_checker = code_checker.replace("'\\''", "'")
-    code_checker = code_checker.replace("\\'", "")
+    code_checker = code_checker.replace("'\\'", '')
     file.write_text(code_checker)
 
     folder_user = Path(folder_user)
@@ -67,17 +72,21 @@ def run_checker(code_checker, test_count, folder_user="user", folder_author="aut
     for i in range(test_count):
         try:
             process = subprocess.run(
-                ['python', 'checker.py', folder_user / f'{i}.txt', folder_author / f'{i}.txt'],
+                [
+                    'python',
+                    'checker.py',
+                    folder_user / f'{i}.txt',
+                    folder_author / f'{i}.txt',
+                ],
                 check=True,
                 text=True,
                 capture_output=True,
-                timeout=time_limit
+                timeout=time_limit,
             )
             if 'OK' not in process.stdout:
                 return 'WA', i
-        except Exception as e:
-            return "Fail", i
-
+        except Exception:
+            return 'Fail', i
 
 
 if __name__ == '__main__':
@@ -94,23 +103,31 @@ if __name__ == '__main__':
         print(json.dumps(result))
         exit()
 
-    result_auth = run_code(author_code, 'author', tests_parsed, time_limit, memory_limit)
+    result_auth = run_code(
+        author_code,
+        'author',
+        tests_parsed,
+        time_limit,
+        memory_limit,
+    )
     if result_auth['status'] != 'AC':
         result['status'] = 'Fail'
         result['message'] = 'Testing error, problem on our side'
         result['test_error'] = result_auth['test_error'] + 1
         print(json.dumps(result))
         exit()
+
     res = run_checker(checker, len(tests_parsed))
     if res is None:
         print(json.dumps(result))
         exit()
+
     result['status'] = res[0]
     result['test_error'] = res[1] + 1
 
     if res[0] == 'Fail':
         result['message'] = 'Ошибка проверяющей системы'
     elif res[0] == 'WA':
-        result['message'] = f'Неправильный ответ'
+        result['message'] = 'Неправильный ответ'
 
     print(json.dumps(result))

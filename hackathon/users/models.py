@@ -3,7 +3,6 @@ import sys
 import django.contrib.auth.models
 from django.contrib.auth.models import User as AuthUser
 from django.core.exceptions import ValidationError
-from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
@@ -20,10 +19,17 @@ class Profile(django.db.models.Model):
     user = django.db.models.OneToOneField(
         django.contrib.auth.models.User,
         on_delete=django.db.models.CASCADE,
-        related_name="profile",
+        related_name='profile',
     )
 
     total_xp = django.db.models.IntegerField(default=0, verbose_name='всего опыта')
+
+    def get_level(self):
+        return self.total_xp // 100 + 1
+
+    def get_next_level_xp(self):
+        # XP для следующего уровня
+        return 100 - self.total_xp % 100
 
 
 @receiver(post_save, sender=AuthUser)

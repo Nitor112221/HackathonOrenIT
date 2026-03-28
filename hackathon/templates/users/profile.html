@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Профиль {{ profile_user.username }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- Левая колонка: аватар и общая информация -->
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body text-center">
+                    {% if profile.avatar %}
+                        <img src="{{ profile.avatar.url }}" class="rounded-circle img-fluid" style="width: 150px;">
+                    {% else %}
+                        <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center" style="width: 150px; height: 150px;">
+                            <span class="text-white display-4">{{ profile_user.username|make_list|first|upper }}</span>
+                        </div>
+                    {% endif %}
+                    <h3 class="mt-3">{{ profile_user.username }}</h3>
+                    <p class="text-muted">Уровень {{ level }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Прогресс</h5>
+                    <p>Опыт: {{ profile.total_xp }} XP</p>
+                    <div class="progress mb-2">
+                        {% with remaining=next_level_xp %}
+                            <div class="progress-bar" role="progressbar" style="width: {{ remaining|floatformat:0 }}%" aria-valuenow="{{ remaining }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        {% endwith %}
+                    </div>
+                    <p class="small">До следующего уровня: {{ next_level_xp }} XP</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Достижения</h5>
+                    <div class="row">
+                        {% for achievement in all_achievements %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card {% if achievement in earned_achievements %}border-success{% else %}border-secondary{% endif %}">
+                                    <div class="card-body">
+                                        <h6>{{ achievement.name }}</h6>
+                                        <p class="small">{{ achievement.description }}</p>
+                                        {% if achievement in earned_achievements %}
+                                            <span class="badge bg-success">Получено</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p>Достижений пока нет.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

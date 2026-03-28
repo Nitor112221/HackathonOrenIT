@@ -175,7 +175,7 @@ cython_debug/
 .pypirc
 
 .vscode
-media
+# media
 send_mail
 media_temp
 .DS_Store

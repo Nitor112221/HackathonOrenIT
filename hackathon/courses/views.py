@@ -1,13 +1,16 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from django.views.generic import DetailView, ListView
 
 import core.dto
 from core.tasks import run_user_code_in_docker
 from courses.models import Fragment, Lesson, Module, TaskAttempt, UserFragmentProgress
+from gamification.achievement_service import check_achievements
+from gamification.models import UserLessonProgress
 
 
 class ModuleListView(LoginRequiredMixin, ListView):
@@ -71,7 +74,11 @@ class LessonDetailView(LoginRequiredMixin, DetailView):
 def fragment_detail(request, fragment_id):
     fragment = get_object_or_404(Fragment, id=fragment_id)
     user = request.user
-    last_attempt = TaskAttempt.objects.filter(user=user, fragment=fragment).order_by('-created_at').first()
+    last_attempt = (
+        TaskAttempt.objects.filter(user=user, fragment=fragment)
+        .order_by('-created_at')
+        .first()
+    )
     pending = last_attempt and last_attempt.status == 'pending'
     context = {
         'fragment': fragment,
@@ -85,8 +92,9 @@ def fragment_detail(request, fragment_id):
 @login_required
 def complete_fragment(request, fragment_id):
     fragment = get_object_or_404(Fragment, id=fragment_id)
+    user = request.user
     progress, created = UserFragmentProgress.objects.get_or_create(
-        user=request.user,
+        user=user,
         fragment=fragment,
     )
     if not progress.completed:
@@ -96,10 +104,26 @@ def complete_fragment(request, fragment_id):
         request.user.profile.total_xp += fragment.xp_reward
         request.user.profile.save()
 
+        lesson = fragment.lesson
+        total_fragments = lesson.fragments.count()
+        completed_fragments = UserFragmentProgress.objects.filter(user=user, fragment__lesson=lesson,
+                                                                  completed=True).count()
+        if total_fragments == completed_fragments:
+            lesson_progress, _ = UserLessonProgress.objects.get_or_create(user=user, lesson=lesson)
+            if not lesson_progress.completed:
+                lesson_progress.completed = True
+                lesson_progress.completed_at = timezone.now()
+                lesson_progress.save()
+
+        new_achievements = check_achievements(user)
+
+        for ach in new_achievements:
+            messages.success(request, f'Новое достижение: {ach.name}! +{ach.xp_reward} XP')
+
     return render(
         request,
         'courses/fragments/fragment_base.html',
-        {'fragment': fragment },
+        {'fragment': fragment},
     )
 
 
@@ -133,7 +157,11 @@ def submit_task(request, fragment_id):
             fragment.pk,
         )
 
-        last_attempt = TaskAttempt.objects.filter(user=user, fragment=fragment).order_by('-created_at').first()
+        last_attempt = (
+            TaskAttempt.objects.filter(user=user, fragment=fragment)
+            .order_by('-created_at')
+            .first()
+        )
         pending = last_attempt and last_attempt.status == 'pending'
         context = {
             'fragment': fragment,
@@ -141,12 +169,9 @@ def submit_task(request, fragment_id):
             'pending': pending,
             'user_code': last_attempt.answer if last_attempt and not pending else '',
         }
-        return render(
-            request,
-            'courses/fragments/fragment_base.html',
-            context
-        )
-    elif fragment.type == 'quiz':
+        return render(request, 'courses/fragments/fragment_base.html', context)
+
+    if fragment.type == 'quiz':
         correct_options = fragment.data.get('correct', [])
         selected = request.POST.getlist('options')
         selected = list(map(int, selected))
@@ -176,40 +201,61 @@ def submit_task(request, fragment_id):
             user.profile.total_xp += fragment.xp_reward
             user.profile.save()
 
+            lesson = fragment.lesson
+            total_fragments = lesson.fragments.count()
+            completed_fragments = UserFragmentProgress.objects.filter(user=user, fragment__lesson=lesson,
+                                                                      completed=True).count()
+            if total_fragments == completed_fragments:
+                lesson_progress, _ = UserLessonProgress.objects.get_or_create(user=user, lesson=lesson)
+                if not lesson_progress.completed:
+                    lesson_progress.completed = True
+                    lesson_progress.completed_at = timezone.now()
+                    lesson_progress.save()
+
+            new_achievements = check_achievements(user)
+
+            for ach in new_achievements:
+                messages.success(request, f'Новое достижение: {ach.name}! +{ach.xp_reward} XP')
+
         return render(
             request,
             'courses/fragments/fragment_base.html',
             {
                 'fragment': fragment,
                 'completed': True,
-             },
+            },
         )
-    else:
-        context = {
-            'fragment': fragment,
-            'error': 'Ответ неверный, попробуйте ещё раз',
-            'completed': False,
-        }
-        return render(
-            request,
-            'courses/fragments/fragment_base.html',
-            context,
-        )
+
+    context = {
+        'fragment': fragment,
+        'error': 'Ответ неверный, попробуйте ещё раз',
+        'completed': False,
+    }
+    return render(
+        request,
+        'courses/fragments/fragment_base.html',
+        context,
+    )
+
 
 @login_required
 def fragment_status(request, fragment_id):
-    attempt: TaskAttempt = TaskAttempt.objects.filter(
-        user=request.user,
-        fragment_id=fragment_id
-    ).order_by('-created_at').first()
+    attempt: TaskAttempt = (
+        TaskAttempt.objects.filter(user=request.user, fragment_id=fragment_id)
+        .order_by('-created_at')
+        .first()
+    )
 
     if attempt:
         data = {
-            'status': attempt.status,          # 'pending', 'success', 'failed', 'error', 'running'
+            'status': attempt.status,
             'is_correct': attempt.is_correct,
             'message': attempt.output or '',
-            'completed_at': attempt.completed_at.isoformat() if attempt.completed_at else None,
+            'completed_at': (
+                attempt.completed_at.isoformat() if attempt.completed_at else None
+            ),
         }
     else:
         data = {'status': 'none'}
+
     return JsonResponse(data)
